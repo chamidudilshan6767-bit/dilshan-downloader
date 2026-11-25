@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
     <title>TikTok Downloader - Dilshan</title>
-    <link rel="icon" type="image/png" sizes="192x192" href="/logo.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
     <style>
         * {
             box-sizing: border-box;
@@ -25,16 +27,16 @@
         .container {
             width: 100%;
             max-width: 450px;
-            margin-top: 20px;
+            margin-top: 16px;
         }
-        
-        /* Top Navigation Header (No Logout) */
+
+        /* Top Navigation Header */
         .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
         .brand {
             display: flex;
@@ -46,31 +48,32 @@
             height: 38px;
             border-radius: 8px;
             border: 1px solid #333333;
-            padding: 2px;
             object-fit: cover;
+            background: #111111;
         }
         .brand-name {
             font-weight: 700;
             font-size: 1.1rem;
             color: #ffffff;
-            letter-spacing: 0.5px;
         }
         .btn-install {
             background: #ffffff;
             color: #000000;
-            border: none;
+            border: 1px solid #ffffff;
             padding: 8px 14px;
             border-radius: 6px;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: opacity 0.2s;
         }
-        .btn-install:hover {
-            opacity: 0.9;
+        .btn-install:disabled {
+            background: #1a1a1a;
+            color: #888888;
+            border-color: #333333;
+            cursor: default;
         }
 
         /* Main Downloader Card */
@@ -78,55 +81,47 @@
             background: #090909;
             border: 1px solid #222222;
             border-radius: 20px;
-            padding: 30px 20px;
+            padding: 28px 20px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        }
-
-        .main-logo-container {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 20px;
         }
         .main-logo {
-            width: 90px;
-            height: 90px;
+            width: 86px;
+            height: 86px;
             border-radius: 18px;
             border: 1px solid #333333;
             padding: 6px;
             background: #000000;
+            margin-bottom: 18px;
+            object-fit: cover;
         }
-
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.45rem;
             font-weight: 800;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
             margin-bottom: 8px;
             color: #ffffff;
             text-transform: uppercase;
         }
         .subtitle {
             font-size: 0.85rem;
-            color: #888888;
-            margin-bottom: 25px;
-            line-height: 1.4;
+            color: #999999;
+            margin-bottom: 22px;
+            line-height: 1.45;
         }
 
-        /* Input and Action Button */
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 14px;
         }
         .url-input {
             width: 100%;
             background: #121212;
             border: 1px solid #333333;
             color: #ffffff;
-            padding: 15px;
+            padding: 14px;
             border-radius: 10px;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             outline: none;
             text-align: center;
-            transition: border-color 0.2s;
         }
         .url-input:focus {
             border-color: #ffffff;
@@ -136,257 +131,311 @@
             background: #ffffff;
             color: #000000;
             border: none;
-            padding: 15px;
+            padding: 14px;
             border-radius: 10px;
-            font-size: 1rem;
+            font-size: 0.98rem;
             font-weight: 700;
             cursor: pointer;
-            transition: background 0.2s;
         }
-        .btn-download:hover {
-            background: #e5e5e5;
+        .btn-download:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
-        /* Results Area (Initially Hidden) */
+        .status-msg {
+            margin-top: 12px;
+            font-size: 0.82rem;
+            color: #bbbbbb;
+            min-height: 18px;
+        }
+
+        /* Results Area */
         .results-container {
-            display: none; /* JavaScript use this to show on load */
-            margin-top: 30px;
+            display: none;
+            margin-top: 24px;
             border-top: 1px solid #222222;
-            padding-top: 25px;
+            padding-top: 22px;
             text-align: left;
         }
         .preview-media {
             width: 100%;
+            max-height: 280px;
+            object-fit: cover;
             border-radius: 12px;
             border: 1px solid #333333;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             background: #121212;
         }
         .video-desc {
-            font-size: 0.9rem;
-            color: #dddddd;
-            margin-bottom: 15px;
+            font-size: 0.88rem;
+            color: #e5e5e5;
+            margin-bottom: 16px;
             line-height: 1.4;
+            word-break: break-word;
         }
-        
         .download-options-title {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: #888888;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .btn-group {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
-
-        /* Black and White Option Buttons */
         .option-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
-            padding: 14px;
+            padding: 13px;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             text-decoration: none;
             cursor: pointer;
-            transition: all 0.2s;
             border: 1px solid #333333;
         }
-        
-        /* White filled for primary button */
         .btn-primary-bw {
             background: #ffffff;
             color: #000000;
-            border: 1px solid #ffffff;
+            border-color: #ffffff;
         }
-        .btn-primary-bw:hover {
-            background: #e5e5e5;
-        }
-
-        /* Black bordered for alternative options */
         .btn-secondary-bw {
             background: #000000;
             color: #ffffff;
         }
-        .btn-secondary-bw:hover {
-            background: #121212;
-            border-color: #555555;
-        }
 
-        /* Slideshow Photo wrapper (TikTok Image Mode) */
+        /* Slideshow Photos */
         .slideshow-container {
-            display: none; /* Visible if photos found */
-            margin-top: 10px;
-            margin-bottom: 15px;
+            display: none;
+            margin-bottom: 16px;
         }
-        .slides-scroll {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 8px;
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 8px;
         }
-        .slides-scroll::-webkit-scrollbar {
-            height: 4px;
+        .photo-item {
+            background: #111111;
+            border: 1px solid #262626;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
         }
-        .slides-scroll::-webkit-scrollbar-thumb {
-            background: #333333;
-            border-radius: 10px;
-        }
-        .slide-thumb {
-            width: 80px;
-            height: 80px;
-            border-radius: 6px;
+        .photo-item img {
+            width: 100%;
+            height: 110px;
             object-fit: cover;
-            border: 1px solid #222222;
-            flex-shrink: 0;
+            border-radius: 6px;
+            margin-bottom: 6px;
+        }
+        .photo-dl-link {
+            display: block;
+            background: #ffffff;
+            color: #000000;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 6px;
+            border-radius: 6px;
         }
 
         .footer {
             text-align: center;
-            margin-top: 25px;
+            margin-top: 22px;
             font-size: 11px;
-            color: #555555;
-            letter-spacing: 0.5px;
+            color: #666666;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Top Header -->
     <div class="top-nav">
         <div class="brand">
-            <img src="/logo.png" alt="TikTok DL Icon" class="brand-icon" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3046/3046121.png'">
+            <img src="/icon-512.png" alt="TikTok DL Icon" class="brand-icon" onerror="this.src='/logo.png'">
             <span class="brand-name">TikTok DL</span>
         </div>
-        <button class="btn-install">
-            📱 Install App
-        </button>
+        <button type="button" class="btn-install" id="installBtn">Install App</button>
     </div>
 
-    <!-- Main Card -->
     <div class="card">
-        <div class="main-logo-container">
-            <img src="/logo.png" alt="TikTok Downloader" class="main-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3046/3046121.png'">
-        </div>
-
+        <img src="/icon-512.png" alt="TikTok Downloader" class="main-logo" onerror="this.src='/logo.png'">
         <h1>TikTok Downloader</h1>
-        <p class="subtitle">Download TikTok Videos (1080p, 720p), Slideshow Photos & High Quality MP3 Music without Watermark</p>
+        <p class="subtitle">Download TikTok Videos (HD / No Watermark), Slideshow Photos & MP3 Audio</p>
 
-        <!-- Search Input -->
         <div class="input-group">
-            <input type="text" id="tiktokUrl" class="url-input" placeholder="https://vt.tiktok.com/ZS.../" value="">
+            <input type="url" id="tiktokUrl" class="url-input" placeholder="https://vt.tiktok.com/..." required>
         </div>
-        <button onclick="fetchVideoData()" class="btn-download" id="searchBtn">Download Now</button>
+        <button type="button" onclick="fetchVideoData()" class="btn-download" id="searchBtn">Download Now</button>
+        <div id="statusMsg" class="status-msg"></div>
 
-        <!-- Downloader Results Box (Loaded via API/JS) -->
         <div id="results" class="results-container">
-            <!-- Media Preview (Image overlay or video tag) -->
-            <img id="previewImage" src="https://via.placeholder.com/400x250/111/fff?text=Loading+Preview..." alt="Video Preview" class="preview-media">
-            
-            <p id="videoDesc" class="video-desc">No description available</p>
+            <img id="previewImage" src="" alt="Preview" class="preview-media">
+            <p id="videoDesc" class="video-desc"></p>
 
-            <!-- TikTok Photo Slideshow (Hidden by default, shown if content is slide) -->
+            <!-- Photo Slideshow Section -->
             <div id="photoSlideshow" class="slideshow-container">
-                <p class="download-options-title" style="margin-bottom: 6px;">TikTok Photos Found</p>
-                <div class="slides-scroll" id="photoList">
-                    <!-- Dynamic thumbs with js -->
+                <p class="download-options-title">TikTok Photos Found:</p>
+                <div id="photoGrid" class="photo-grid"></div>
+            </div>
+
+            <!-- Video & Audio Buttons -->
+            <div id="videoOptions">
+                <p class="download-options-title">Select Quality to Download:</p>
+                <div class="btn-group">
+                    <a href="#" id="dlHdNoWm" class="option-btn btn-primary-bw" target="_blank" rel="noopener noreferrer" download>
+                        Download HD Video (No Watermark)
+                    </a>
+                    <a href="#" id="dlNoWm" class="option-btn btn-secondary-bw" target="_blank" rel="noopener noreferrer" download>
+                        Download Standard Video (No Watermark)
+                    </a>
+                    <a href="#" id="dlWm" class="option-btn btn-secondary-bw" target="_blank" rel="noopener noreferrer" download>
+                        Download Watermark Video
+                    </a>
+                    <a href="#" id="dlAudio" class="option-btn btn-secondary-bw" target="_blank" rel="noopener noreferrer" download>
+                        Download Audio (MP3 / Sound)
+                    </a>
                 </div>
             </div>
-
-            <p class="download-options-title">Select Quality to Download:</p>
-            
-            <div class="btn-group">
-                <!-- 1. Video options -->
-                <a href="#" id="dlNoWatermarkHD" class="option-btn btn-primary-bw" download>
-                    Download 1080p Full HD (No Watermark)
-                </a>
-                
-                <a href="#" id="dlNoWatermarkSD" class="option-btn btn-secondary-bw" download>
-                    Download 720p HD (No Watermark)
-                </a>
-                
-                <a href="#" id="dlWatermark" class="option-btn btn-secondary-bw" download>
-                    Download Watermark Video
-                </a>
-
-                <!-- 2. TikTok Photos Downloader (Appears only if slideshow) -->
-                <button onclick="downloadAllPhotos()" id="dlAllPhotosBtn" class="option-btn btn-primary-bw" style="display: none;">
-                    Download All Photos (ZIP / Bulk)
-                </button>
-
-                <!-- 3. Music/Sound option -->
-                <a href="#" id="dlAudio" class="option-btn btn-secondary-bw" download>
-                     Download Audio (MP3 / Sound)
-                </a>
-            </div>
         </div>
 
-        <div class="footer">
-            © Powered by Dilshan
-        </div>
+        <div class="footer">© Powered by Dilshan</div>
     </div>
 </div>
 
 <script>
-    // Example Mock Function: (මෙතනට ඔබේ downloader backend API එක හෝ integration එක දාන්න)
-    function fetchVideoData() {
-        const url = document.getElementById('tiktokUrl').value.trim();
-        if(!url) {
-            alert('Please paste a TikTok link!');
+    // 1. PWA Install Logic
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.disabled = false;
+        installBtn.textContent = 'Install App';
+    });
+
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            if (outcome === 'accepted') {
+                installBtn.textContent = 'Installed';
+                installBtn.disabled = true;
+            }
+        } else {
+            alert('Browser menu එකේ "Add to Home screen" හෝ "Install app" option එකෙන් app එක install කරන්න.');
+        }
+    });
+
+    window.addEventListener('appinstalled', () => {
+        installBtn.textContent = 'Installed';
+        installBtn.disabled = true;
+    });
+
+    // 2. TikTok Video, Photo & Audio Fetch Logic
+    async function fetchVideoData() {
+        const urlInput = document.getElementById('tiktokUrl');
+        const url = urlInput.value.trim();
+        const searchBtn = document.getElementById('searchBtn');
+        const statusMsg = document.getElementById('statusMsg');
+        const resultsEl = document.getElementById('results');
+
+        if (!url || !url.includes('tiktok.com')) {
+            statusMsg.textContent = 'කරුණාකර වලංගු TikTok link එකක් ඇතුළත් කරන්න.';
             return;
         }
 
-        const searchBtn = document.getElementById('searchBtn');
-        searchBtn.innerText = "Please wait...";
         searchBtn.disabled = true;
+        searchBtn.textContent = 'Fetching...';
+        statusMsg.textContent = 'Media තොරතුරු ලබා ගනිමින් පවතී...';
+        resultsEl.style.display = 'none';
 
-        // API interaction / fetch emulation 
-        setTimeout(() => {
-            // Result block එක පෙන්නන්න
-            document.getElementById('results').style.display = 'block';
-            
-            // Example data (for visualization)
-            document.getElementById('previewImage').src = "https://images.unsplash.com/photo-1516280440614-37939bbacd6a?w=400";
-            document.getElementById('videoDesc').innerText = "Awesome TikTok Content #trending #fun #music @creator";
-            
-            // Photo Slideshow Example Mock (පින්තූර Slideshow link එකක් නම් විතරක් මේ block එක enable කරන්න පුළුවන්)
-            const showSlideshow = false; // logic based on response
-            if(showSlideshow) {
-                document.getElementById('photoSlideshow').style.display = 'block';
-                document.getElementById('dlAllPhotosBtn').style.display = 'flex';
-                // mock photos
-                const list = document.getElementById('photoList');
-                list.innerHTML = `
-                    <img class="slide-thumb" src="https://via.placeholder.com/80/222/fff?text=Photo+1">
-                    <img class="slide-thumb" src="https://via.placeholder.com/80/222/fff?text=Photo+2">
-                    <img class="slide-thumb" src="https://via.placeholder.com/80/222/fff?text=Photo+3">
-                `;
-            } else {
-                document.getElementById('photoSlideshow').style.display = 'none';
-                document.getElementById('dlAllPhotosBtn').style.display = 'none';
+        try {
+            const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
+            const response = await fetch(apiUrl);
+            const json = await response.json();
+
+            if (!json || json.code !== 0 || !json.data) {
+                throw new Error(json && json.msg ? json.msg : 'Data fetch failed');
             }
 
-            // Set dynamic download links to the buttons
-            document.getElementById('dlNoWatermarkHD').href = "#"; // Replace with real url
-            document.getElementById('dlNoWatermarkSD').href = "#";
-            document.getElementById('dlWatermark').href = "#";
-            document.getElementById('dlAudio').href = "#";
+            const data = json.data;
+            document.getElementById('previewImage').src = data.cover || data.origin_cover || '/icon-512.png';
+            document.getElementById('videoDesc').textContent = data.title || 'TikTok Media';
 
-            searchBtn.innerText = "Download Now";
+            const slideshowEl = document.getElementById('photoSlideshow');
+            const photoGridEl = document.getElementById('photoGrid');
+            const videoOptionsEl = document.getElementById('videoOptions');
+
+            // Slideshow Photos තිබේදැයි පරීක්ෂා කිරීම
+            if (Array.isArray(data.images) && data.images.length > 0) {
+                slideshowEl.style.display = 'block';
+                photoGridEl.innerHTML = '';
+                data.images.forEach((imgUrl, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'photo-item';
+                    div.innerHTML = `
+                        <img src="${imgUrl}" alt="Photo ${idx + 1}">
+                        <a href="${imgUrl}" class="photo-dl-link" target="_blank" rel="noopener noreferrer" download="tiktok-photo-${idx + 1}.jpg">Download Photo ${idx + 1}</a>
+                    `;
+                    photoGridEl.appendChild(div);
+                });
+            } else {
+                slideshowEl.style.display = 'none';
+                photoGridEl.innerHTML = '';
+            }
+
+            // Video & Audio links සැකසීම
+            const noWmUrl = data.play || '';
+            const hdUrl = data.hdplay || data.play || '';
+            const wmUrl = data.wmplay || data.play || '';
+            const audioUrl = data.music || '';
+
+            if (noWmUrl || hdUrl || wmUrl) {
+                videoOptionsEl.style.display = 'block';
+                setLink('dlHdNoWm', hdUrl, 'tiktok-hd.mp4');
+                setLink('dlNoWm', noWmUrl, 'tiktok-no-watermark.mp4');
+                setLink('dlWm', wmUrl, 'tiktok-watermark.mp4');
+                setLink('dlAudio', audioUrl, 'tiktok-audio.mp3');
+            } else {
+                videoOptionsEl.style.display = 'none';
+            }
+
+            resultsEl.style.display = 'block';
+            statusMsg.textContent = '';
+        } catch (err) {
+            statusMsg.textContent = 'Download links ලබා ගැනීමට නොහැකි විය. Link එක public එකක්දැයි පරීක්ෂා කර නැවත උත්සාහ කරන්න.';
+        } finally {
             searchBtn.disabled = false;
-            
-            // auto-scroll to view download options
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-        }, 1500);
+            searchBtn.textContent = 'Download Now';
+        }
+    }
+
+    function setLink(id, href, filename) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (href) {
+            el.href = href;
+            el.setAttribute('download', filename);
+            el.style.display = 'flex';
+        } else {
+            el.style.display = 'none';
+        }
     }
 </script>
 
