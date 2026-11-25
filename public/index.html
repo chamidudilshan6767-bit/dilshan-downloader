@@ -3,153 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dilshan All In One - Utility Toolbox</title>
+    <title>TikTok Downloader - Dilshan</title>
     <link rel="icon" type="image/png" sizes="192x192" href="/logo.png">
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         body {
-            background-color: #0b0e14;
+            background-color: #000000;
             color: #ffffff;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            justify-content: center;
-        }
-        .card {
-            background: #121824;
-            border: 1px solid #1f293d;
-            border-radius: 16px;
-            padding: 25px;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-        }
-        header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .logo-img {
-            width: 75px;
-            height: 75px;
-            border-radius: 14px;
-            margin-bottom: 10px;
-            border: 2px solid #1f293d;
-            object-fit: contain;
-            background: #0b0e14;
-        }
-        header h1 {
-            color: #00c6ff;
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-        header p {
-            color: #8a99ad;
-            font-size: 0.9rem;
+            justify-content: flex-start;
         }
         .container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            width: 100%;
+            max-width: 450px;
+            margin-top: 20px;
         }
-        .tool-card {
-            background: #192233;
-            border: 1px solid #2a364f;
-            padding: 16px;
-            border-radius: 12px;
+        
+        /* Top Navigation Header (No Logout) */
+        .top-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: transform 0.2s;
+            width: 100%;
+            margin-bottom: 30px;
         }
-        .tool-card:hover {
-            transform: translateY(-2px);
-            border-color: #00c6ff;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .tool-info h2 {
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            border: 1px solid #333333;
+            padding: 2px;
+            object-fit: cover;
+        }
+        .brand-name {
+            font-weight: 700;
             font-size: 1.1rem;
             color: #ffffff;
-            margin-bottom: 3px;
+            letter-spacing: 0.5px;
         }
-        .tool-info p {
-            font-size: 0.8rem;
-            color: #8a99ad;
-        }
-        .btn-open {
-            background: linear-gradient(90deg, #0072ff, #00c6ff);
-            color: white;
-            padding: 8px 16px;
+        .btn-install {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 8px 14px;
             border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
             font-size: 0.85rem;
-            white-space: nowrap;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.2s;
         }
+        .btn-install:hover {
+            opacity: 0.9;
+        }
+
+        /* Main Downloader Card */
+        .card {
+            background: #090909;
+            border: 1px solid #222222;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .main-logo-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .main-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 18px;
+            border: 1px solid #333333;
+            padding: 6px;
+            background: #000000;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+        .subtitle {
+            font-size: 0.85rem;
+            color: #888888;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        /* Input and Action Button */
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .url-input {
+            width: 100%;
+            background: #121212;
+            border: 1px solid #333333;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            outline: none;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .url-input:focus {
+            border-color: #ffffff;
+        }
+        .btn-download {
+            width: 100%;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-download:hover {
+            background: #e5e5e5;
+        }
+
+        /* Results Area (Initially Hidden) */
+        .results-container {
+            display: none; /* JavaScript use this to show on load */
+            margin-top: 30px;
+            border-top: 1px solid #222222;
+            padding-top: 25px;
+            text-align: left;
+        }
+        .preview-media {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #333333;
+            margin-bottom: 15px;
+            background: #121212;
+        }
+        .video-desc {
+            font-size: 0.9rem;
+            color: #dddddd;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .download-options-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #888888;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Black and White Option Buttons */
+        .option-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #333333;
+        }
+        
+        /* White filled for primary button */
+        .btn-primary-bw {
+            background: #ffffff;
+            color: #000000;
+            border: 1px solid #ffffff;
+        }
+        .btn-primary-bw:hover {
+            background: #e5e5e5;
+        }
+
+        /* Black bordered for alternative options */
+        .btn-secondary-bw {
+            background: #000000;
+            color: #ffffff;
+        }
+        .btn-secondary-bw:hover {
+            background: #121212;
+            border-color: #555555;
+        }
+
+        /* Slideshow Photo wrapper (TikTok Image Mode) */
+        .slideshow-container {
+            display: none; /* Visible if photos found */
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .slides-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+        .slides-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+        .slides-scroll::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 10px;
+        }
+        .slide-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid #222222;
+            flex-shrink: 0;
+        }
+
         .footer {
             text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: #5a6b82;
+            margin-top: 25px;
+            font-size: 11px;
+            color: #555555;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <header>
-        <img src="/logo.png" alt="Logo" class="logo-img">
-        <h1>Dilshan All In One</h1>
-        <p>Your ultimate utility toolbox</p>
-    </header>
-
-    <div class="container">
-        <!-- TikTok Downloader -->
-        <div class="tool-card">
-            <div class="tool-info">
-                <h2>TikTok Downloader</h2>
-                <p>1080p, 720p & MP3 (No Watermark)</p>
-            </div>
-            <a href="/tiktok-downloader.html" class="btn-open">Open</a>
+<div class="container">
+    <!-- Top Header -->
+    <div class="top-nav">
+        <div class="brand">
+            <img src="/logo.png" alt="TikTok DL Icon" class="brand-icon" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3046/3046121.png'">
+            <span class="brand-name">TikTok DL</span>
         </div>
-
-        <!-- Custom QR Code Generator -->
-        <div class="tool-card">
-            <div class="tool-info">
-                <h2>Custom QR Generator</h2>
-                <p>Colors & Logo/Image Support</p>
-            </div>
-            <a href="/qr-generator.html" class="btn-open">Open</a>
-        </div>
-
-        <!-- Custom Password Generator -->
-        <div class="tool-card">
-            <div class="tool-info">
-                <h2>Custom Pass Generator</h2>
-                <p>Custom Prefix & Secure Options</p>
-            </div>
-            <a href="/password-generator.html" class="btn-open">Open</a>
-        </div>
-
-        <!-- WhatsApp Unban -->
-        <div class="tool-card">
-            <div class="tool-info">
-                <h2>WhatsApp Unban</h2>
-                <p>Generate appeal support email</p>
-            </div>
-            <a href="/whatsapp-unban.html" class="btn-open">Open</a>
-        </div>
+        <button class="btn-install">
+            📱 Install App
+        </button>
     </div>
 
-    <div class="footer">
-        © Powered by Dilshan
+    <!-- Main Card -->
+    <div class="card">
+        <div class="main-logo-container">
+            <img src="/logo.png" alt="TikTok Downloader" class="main-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3046/3046121.png'">
+        </div>
+
+        <h1>TikTok Downloader</h1>
+        <p class="subtitle">Download TikTok Videos (1080p, 720p), Slideshow Photos & High Quality MP3 Music without Watermark</p>
+
+        <!-- Search Input -->
+        <div class="input-group">
+            <input type="text" id="tiktokUrl" class="url-input" placeholder="https://vt.tiktok.com/ZS.../" value="">
+        </div>
+        <button onclick="fetchVideoData()" class="btn-download" id="searchBtn">Download Now</button>
+
+        <!-- Downloader Results Box (Loaded via API/JS) -->
+        <div id="results" class="results-container">
+            <!-- Media Preview (Image overlay or video tag) -->
+            <img id="previewImage" src="https://via.placeholder.com/400x250/111/fff?text=Loading+Preview..." alt="Video Preview" class="preview-media">
+            
+            <p id="videoDesc" class="video-desc">No description available</p>
+
+            <!-- TikTok Photo Slideshow (Hidden by default, shown if content is slide) -->
+            <div id="photoSlideshow" class="slideshow-container">
+                <p class="download-options-title" style="margin-bottom: 6px;">TikTok Photos Found</p>
+                <div class="slides-scroll" id="photoList">
+                    <!-- Dynamic thumbs with js -->
+                </div>
+            </div>
+
+            <p class="download-options-title">Select Quality to Download:</p>
+            
+            <div class="btn-group">
+                <!-- 1. Video options -->
+                <a href="#" id="dlNoWatermarkHD" class="option-btn btn-primary-bw" download>
+                    Download 1080p Full HD (No Watermark)
+                </a>
+                
+                <a href="#" id="dlNoWatermarkSD" class="option-btn btn-secondary-bw" download>
+                    Download 720p HD (No Watermark)
+                </a>
+                
+                <a href="#" id="dlWatermark" class="option-btn btn-secondary-bw" download>
+                    Download Watermark Video
+                </a>
+
+                <!-- 2. TikTok Photos Downloader (Appears only if slideshow) -->
+                <button onclick="downloadAllPhotos()" id="dlAllPhotosBtn" class="option-btn btn-primary-bw" style="display: none;">
+                    Download All Photos (ZIP / Bulk)
+                </button>
+
+                <!-- 3. Music/Sound option -->
+                <a href="#" id="dlAudio" class="option-btn btn-secondary-bw" download>
+                     Download Audio (MP3 / Sound)
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            © Powered by Dilshan
+        </div>
     </div>
 </div>
+
+<script>
+    // Example Mock Function: (මෙතනට ඔබේ downloader backend API එක හෝ integration එක දාන්න)
+    function fetchVideoData() {
+        const url = document.getElementById('tiktokUrl').value.trim();
+        if(!url) {
+            alert('Please paste a TikTok link!');
+            return;
+        }
+
+        const searchBtn = document.getElementById('searchBtn');
+        searchBtn.innerText = "Please wait...";
+        searchBtn.disabled = true;
+
+        // API interaction / fetch emulation 
+        setTimeout(() => {
+            // Result block එක පෙන්නන්න
+            document.getElementById('results').style.display = 'block';
+            
+            // Example data (for visualization)
+            document.getElementById('previewImage').src = "https://images.unsplash.com/photo-1516280440614-37939bbacd6a?w=400";
+            document.getElementById('videoDesc').innerText = "Awesome TikTok Content #trending #fun #music @creator";
+            
+            // Photo Slideshow Example Mock (පින්තූර Slideshow link එකක් නම් විතරක් මේ block එක enable කරන්න පුළුවන්)
+            const showSlideshow = false; // logic based on response
+            if(showSlideshow) {
+                document.getElementById('photoSlideshow').style.display = 'block';
+                document.getElementById('dlAllPhotosBtn').style.display = 'flex';
+                // mock photos
+                const list = document.getElementById('photoList');
+                list.innerHTML = `
+                    <img class="slide-thumb" src="https://via.placeholder.com/80/222/fff?text=Photo+1">
+                    <img class="slide-thumb" src="https://via.placeholder.com/80/222/fff?text=Photo+2">
+                    <img class="slide-thumb" src="https://via.placeholder.com/80/222/fff?text=Photo+3">
+                `;
+            } else {
+                document.getElementById('photoSlideshow').style.display = 'none';
+                document.getElementById('dlAllPhotosBtn').style.display = 'none';
+            }
+
+            // Set dynamic download links to the buttons
+            document.getElementById('dlNoWatermarkHD').href = "#"; // Replace with real url
+            document.getElementById('dlNoWatermarkSD').href = "#";
+            document.getElementById('dlWatermark').href = "#";
+            document.getElementById('dlAudio').href = "#";
+
+            searchBtn.innerText = "Download Now";
+            searchBtn.disabled = false;
+            
+            // auto-scroll to view download options
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }, 1500);
+    }
+</script>
 
 </body>
 </html>
