@@ -200,6 +200,10 @@
             cursor: pointer;
             border: 1px solid #333333;
         }
+        .option-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         .btn-primary-bw {
             background: #ffffff;
             color: #000000;
@@ -235,15 +239,17 @@
             border-radius: 6px;
             margin-bottom: 6px;
         }
-        .photo-dl-link {
+        .photo-dl-btn {
             display: block;
+            width: 100%;
             background: #ffffff;
             color: #000000;
-            text-decoration: none;
+            border: none;
             font-size: 0.78rem;
             font-weight: 700;
             padding: 6px;
             border-radius: 6px;
+            cursor: pointer;
         }
 
         .footer {
@@ -290,18 +296,18 @@
             <div id="videoOptions">
                 <p class="download-options-title">Select Quality to Download:</p>
                 <div class="btn-group">
-                    <a href="#" id="dlHdNoWm" class="option-btn btn-primary-bw" target="_blank" rel="noopener noreferrer" download>
+                    <button type="button" id="dlHdNoWm" class="option-btn btn-primary-bw">
                         Download HD Video (No Watermark)
-                    </a>
-                    <a href="#" id="dlNoWm" class="option-btn btn-secondary-bw" target="_blank" rel="noopener noreferrer" download>
+                    </button>
+                    <button type="button" id="dlNoWm" class="option-btn btn-secondary-bw">
                         Download Standard Video (No Watermark)
-                    </a>
-                    <a href="#" id="dlWm" class="option-btn btn-secondary-bw" target="_blank" rel="noopener noreferrer" download>
+                    </button>
+                    <button type="button" id="dlWm" class="option-btn btn-secondary-bw">
                         Download Watermark Video
-                    </a>
-                    <a href="#" id="dlAudio" class="option-btn btn-secondary-bw" target="_blank" rel="noopener noreferrer" download>
+                    </button>
+                    <button type="button" id="dlAudio" class="option-btn btn-secondary-bw">
                         Download Audio (MP3 / Sound)
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -347,7 +353,46 @@
         installBtn.disabled = true;
     });
 
-    // 2. TikTok Video, Photo & Audio Fetch Logic
+    // 2. Direct Blob Download (No New Tab)
+    async function triggerDirectDownload(url, filename, btnEl) {
+        const statusMsg = document.getElementById('statusMsg');
+        if (!url) return;
+
+        const originalText = btnEl ? btnEl.textContent : '';
+        if (btnEl) {
+            btnEl.disabled = true;
+            btnEl.textContent = 'Downloading...';
+        }
+        statusMsg.textContent = `${filename} බාගත වෙමින් පවතී...`;
+
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('Network error');
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+            statusMsg.textContent = 'Download ආරම්භ විය!';
+        } catch (err) {
+            // CDN එක CORS block කරනවා නම් fallback ලෙස direct link එකෙන් open කරයි
+            statusMsg.textContent = 'Direct download block වී ඇත; file link එක විවෘත කර save කරන්න.';
+            window.location.href = url;
+        } finally {
+            if (btnEl) {
+                btnEl.disabled = false;
+                btnEl.textContent = originalText;
+            }
+        }
+    }
+
+    // 3. TikTok Video, Photo & Audio Fetch Logic
     async function fetchVideoData() {
         const urlInput = document.getElementById('tiktokUrl');
         const url = urlInput.value.trim();
@@ -382,17 +427,25 @@
             const photoGridEl = document.getElementById('photoGrid');
             const videoOptionsEl = document.getElementById('videoOptions');
 
-            // Slideshow Photos තිබේදැයි පරීක්ෂා කිරීම
             if (Array.isArray(data.images) && data.images.length > 0) {
                 slideshowEl.style.display = 'block';
                 photoGridEl.innerHTML = '';
                 data.images.forEach((imgUrl, idx) => {
                     const div = document.createElement('div');
                     div.className = 'photo-item';
-                    div.innerHTML = `
-                        <img src="${imgUrl}" alt="Photo ${idx + 1}">
-                        <a href="${imgUrl}" class="photo-dl-link" target="_blank" rel="noopener noreferrer" download="tiktok-photo-${idx + 1}.jpg">Download Photo ${idx + 1}</a>
-                    `;
+
+                    const img = document.createElement('img');
+                    img.src = imgUrl;
+                    img.alt = `Photo ${idx + 1}`;
+
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'photo-dl-btn';
+                    btn.textContent = `Download Photo ${idx + 1}`;
+                    btn.onclick = () => triggerDirectDownload(imgUrl, `tiktok-photo-${idx + 1}.jpg`, btn);
+
+                    div.appendChild(img);
+                    div.appendChild(btn);
                     photoGridEl.appendChild(div);
                 });
             } else {
@@ -400,7 +453,6 @@
                 photoGridEl.innerHTML = '';
             }
 
-            // Video & Audio links සැකසීම
             const noWmUrl = data.play || '';
             const hdUrl = data.hdplay || data.play || '';
             const wmUrl = data.wmplay || data.play || '';
@@ -408,10 +460,10 @@
 
             if (noWmUrl || hdUrl || wmUrl) {
                 videoOptionsEl.style.display = 'block';
-                setLink('dlHdNoWm', hdUrl, 'tiktok-hd.mp4');
-                setLink('dlNoWm', noWmUrl, 'tiktok-no-watermark.mp4');
-                setLink('dlWm', wmUrl, 'tiktok-watermark.mp4');
-                setLink('dlAudio', audioUrl, 'tiktok-audio.mp3');
+                bindDownloadBtn('dlHdNoWm', hdUrl, 'tiktok-hd.mp4');
+                bindDownloadBtn('dlNoWm', noWmUrl, 'tiktok-no-watermark.mp4');
+                bindDownloadBtn('dlWm', wmUrl, 'tiktok-watermark.mp4');
+                bindDownloadBtn('dlAudio', audioUrl, 'tiktok-audio.mp3');
             } else {
                 videoOptionsEl.style.display = 'none';
             }
@@ -426,15 +478,14 @@
         }
     }
 
-    function setLink(id, href, filename) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (href) {
-            el.href = href;
-            el.setAttribute('download', filename);
-            el.style.display = 'flex';
+    function bindDownloadBtn(id, url, filename) {
+        const btn = document.getElementById(id);
+        if (!btn) return;
+        if (url) {
+            btn.style.display = 'flex';
+            btn.onclick = () => triggerDirectDownload(url, filename, btn);
         } else {
-            el.style.display = 'none';
+            btn.style.display = 'none';
         }
     }
 </script>
