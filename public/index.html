@@ -65,15 +65,9 @@
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
-            display: inline-flex;
+            display: none;
             align-items: center;
             gap: 6px;
-        }
-        .btn-install:disabled {
-            background: #1a1a1a;
-            color: #888888;
-            border-color: #333333;
-            cursor: default;
         }
 
         /* Main Downloader Card */
@@ -254,9 +248,27 @@
 
         .footer {
             text-align: center;
-            margin-top: 22px;
-            font-size: 11px;
-            color: #666666;
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .powered-by {
+            font-size: 13px;
+            font-weight: 600;
+            color: #bbbbbb;
+            letter-spacing: 0.4px;
+        }
+        .contact-owner {
+            font-size: 12px;
+            color: #ffffff;
+            text-decoration: none;
+            border-bottom: 1px solid #444444;
+            padding-bottom: 2px;
+        }
+        .contact-owner:hover {
+            border-color: #ffffff;
         }
     </style>
 </head>
@@ -312,7 +324,10 @@
             </div>
         </div>
 
-        <div class="footer">Powered by All In One</div>
+        <div class="footer">
+            <div class="powered-by">Powered By Dilshan</div>
+            <a href="https://t.me/dilshan7878?text=TIK%20TOK%20DL" target="_blank" rel="noopener noreferrer" class="contact-owner">Contact Owner</a>
+        </div>
     </div>
 </div>
 
@@ -320,6 +335,20 @@
     // 1. PWA Install Logic
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
+
+    function isStandaloneApp() {
+        return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+
+    function updateInstallButtonVisibility() {
+        if (isStandaloneApp()) {
+            installBtn.style.display = 'none';
+        } else if (deferredPrompt) {
+            installBtn.style.display = 'inline-flex';
+        } else {
+            installBtn.style.display = 'none';
+        }
+    }
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -330,28 +359,27 @@
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        installBtn.disabled = false;
-        installBtn.textContent = 'Install App';
+        updateInstallButtonVisibility();
     });
 
     installBtn.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            deferredPrompt = null;
-            if (outcome === 'accepted') {
-                installBtn.textContent = 'Installed';
-                installBtn.disabled = true;
-            }
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        if (outcome === 'accepted') {
+            installBtn.style.display = 'none';
         } else {
-            alert('Open the browser menu and select "Add to Home screen" or "Install app" to install.');
+            updateInstallButtonVisibility();
         }
     });
 
     window.addEventListener('appinstalled', () => {
-        installBtn.textContent = 'Installed';
-        installBtn.disabled = true;
+        deferredPrompt = null;
+        installBtn.style.display = 'none';
     });
+
+    updateInstallButtonVisibility();
 
     // 2. Direct Blob Download (No New Tab)
     async function triggerDirectDownload(url, filename, btnEl) {
