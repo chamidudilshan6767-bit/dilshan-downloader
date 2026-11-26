@@ -13,6 +13,12 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button:focus,
+        a:focus,
+        input:focus {
+            outline: none;
         }
         body {
             background-color: #000000;
@@ -116,7 +122,6 @@
             padding: 14px 42px 14px 14px;
             border-radius: 10px;
             font-size: 0.92rem;
-            outline: none;
             text-align: center;
         }
         .url-input:focus {
@@ -205,22 +210,87 @@
             padding-top: 22px;
             text-align: left;
         }
-        .preview-media {
-            width: 100%;
-            max-height: 280px;
-            object-fit: cover;
+        .post-meta-card {
+            background: #101010;
+            border: 1px solid #262626;
             border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        .post-top-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .preview-media {
+            width: 72px;
+            height: 92px;
+            object-fit: cover;
+            border-radius: 8px;
             border: 1px solid #333333;
-            margin-bottom: 12px;
-            background: #121212;
+            background: #161616;
+            flex-shrink: 0;
+        }
+        .post-info {
+            min-width: 0;
+            flex: 1;
         }
         .video-desc {
-            font-size: 0.88rem;
-            color: #e5e5e5;
-            margin-bottom: 16px;
-            line-height: 1.4;
+            font-size: 0.86rem;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.35;
             word-break: break-word;
         }
+        .author-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: #cccccc;
+        }
+        .author-avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #3a3a3a;
+            background: #1b1b1b;
+            flex-shrink: 0;
+        }
+        .author-handle {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            border-top: 1px solid #222222;
+            padding-top: 10px;
+            text-align: center;
+        }
+        .stat-box {
+            background: #161616;
+            border: 1px solid #252525;
+            border-radius: 8px;
+            padding: 6px 4px;
+        }
+        .stat-val {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .stat-lbl {
+            font-size: 0.68rem;
+            color: #999999;
+            margin-top: 2px;
+        }
+
         .download-options-title {
             font-size: 0.8rem;
             font-weight: 600;
@@ -262,7 +332,7 @@
             color: #ffffff;
         }
 
-        /* Slideshow Photos & Bulk Select */
+        /* Slideshow Photos & Selection */
         .slideshow-container {
             display: none;
             margin-bottom: 18px;
@@ -273,7 +343,6 @@
             align-items: center;
             gap: 8px;
             margin-bottom: 10px;
-            flex-wrap: wrap;
         }
         .select-all-label {
             display: inline-flex;
@@ -289,20 +358,6 @@
             height: 16px;
             accent-color: #ffffff;
             cursor: pointer;
-        }
-        .btn-bulk-dl {
-            background: #ffffff;
-            color: #000000;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .btn-bulk-dl:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
         .photo-grid {
             display: grid;
@@ -348,60 +403,50 @@
             cursor: pointer;
         }
 
-        /* Download Another Video */
+        /* Download Another Video (SnapTik Style) */
         .another-wrap {
             margin-top: 16px;
+            text-align: center;
         }
         .btn-another {
             width: 100%;
-            background: #121212;
-            color: #ffffff;
-            border: 1px solid #ffffff;
+            background: #0c0c0c;
+            color: #cccccc;
+            border: 1px solid #333333;
             padding: 12px;
             border-radius: 8px;
-            font-size: 0.88rem;
-            font-weight: 700;
+            font-size: 0.86rem;
+            font-weight: 600;
             cursor: pointer;
         }
         .btn-another:hover {
-            background: #ffffff;
-            color: #000000;
+            border-color: #ffffff;
+            color: #ffffff;
         }
 
-        /* Footer & Prominent Telegram Contact */
+        /* Footer */
         .footer {
             text-align: center;
             margin-top: 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
-        }
-        .telegram-contact-btn {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            background: #141414;
-            color: #ffffff;
-            border: 1px solid #ffffff;
-            border-radius: 10px;
-            padding: 12px 16px;
-            font-size: 0.92rem;
-            font-weight: 700;
-            text-decoration: none;
-            letter-spacing: 0.3px;
-        }
-        .telegram-contact-btn:hover {
-            background: #ffffff;
-            color: #000000;
+            gap: 6px;
         }
         .powered-by {
             font-size: 13px;
             font-weight: 600;
             color: #bbbbbb;
             letter-spacing: 0.4px;
+        }
+        .contact-owner {
+            font-size: 11px;
+            color: #888888;
+            text-decoration: none;
+        }
+        .contact-owner:hover {
+            color: #ffffff;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -441,10 +486,39 @@
         <div id="statusMsg" class="status-msg"></div>
 
         <div id="results" class="results-container">
-            <img id="previewImage" src="" alt="Preview" class="preview-media">
-            <p id="videoDesc" class="video-desc"></p>
+            <!-- Post Creator & Engagement Stats (SnapTik Style) -->
+            <div class="post-meta-card">
+                <div class="post-top-row">
+                    <img id="previewImage" src="" alt="Preview" class="preview-media">
+                    <div class="post-info">
+                        <p id="videoDesc" class="video-desc"></p>
+                        <div class="author-row">
+                            <img id="authorAvatar" src="" alt="Creator" class="author-avatar" onerror="this.style.display='none'">
+                            <span id="authorHandle" class="author-handle">@creator</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div id="statViews" class="stat-val">0</div>
+                        <div class="stat-lbl">Views</div>
+                    </div>
+                    <div class="stat-box">
+                        <div id="statLikes" class="stat-val">0</div>
+                        <div class="stat-lbl">Likes</div>
+                    </div>
+                    <div class="stat-box">
+                        <div id="statComments" class="stat-val">0</div>
+                        <div class="stat-lbl">Comments</div>
+                    </div>
+                    <div class="stat-box">
+                        <div id="statShares" class="stat-val">0</div>
+                        <div class="stat-lbl">Shares</div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Photo Slideshow Section -->
+            <!-- Photo Slideshow Selection Section -->
             <div id="photoSlideshow" class="slideshow-container">
                 <p class="download-options-title">TikTok Photos Found:</p>
                 <div class="photo-toolbar">
@@ -452,17 +526,17 @@
                         <input type="checkbox" id="selectAllPhotos" checked onchange="toggleSelectAllPhotos()">
                         <span>Select All Photos</span>
                     </label>
-                    <button type="button" id="downloadSelectedBtn" class="btn-bulk-dl" onclick="downloadSelectedPhotos()">
-                        Download All Selected
-                    </button>
                 </div>
                 <div id="photoGrid" class="photo-grid"></div>
             </div>
 
-            <!-- Video & Audio Buttons -->
-            <div id="videoOptions">
+            <!-- Download Buttons List -->
+            <div id="downloadOptions">
                 <p class="download-options-title">Select Quality to Download:</p>
                 <div class="btn-group">
+                    <button type="button" id="dlBulkPhotos" class="option-btn btn-primary-bw" style="display: none;" onclick="downloadSelectedPhotos()">
+                        Download All Selected Photos
+                    </button>
                     <button type="button" id="dlHdNoWm" class="option-btn btn-primary-bw">
                         Download HD Video (No Watermark)
                     </button>
@@ -478,7 +552,7 @@
                 </div>
             </div>
 
-            <!-- Download Another Video (SnapTik Style Reset) -->
+            <!-- Download Another Video -->
             <div class="another-wrap">
                 <button type="button" class="btn-another" onclick="resetForAnotherVideo()">
                     Download Another Video
@@ -487,10 +561,8 @@
         </div>
 
         <div class="footer">
-            <a href="https://t.me/dilshan7878?text=TIK%20TOK%20DL" target="_blank" rel="noopener noreferrer" class="telegram-contact-btn">
-                Contact Owner on Telegram (@dilshan7878)
-            </a>
             <div class="powered-by">Powered By Chamidu Dilshan</div>
+            <a href="https://t.me/dilshan7878?text=TIK%20TOK%20DL" target="_blank" rel="noopener noreferrer" class="contact-owner">Contact Owner</a>
         </div>
     </div>
 </div>
@@ -609,7 +681,16 @@
         setProgressValue(0, 'Processing...');
     }
 
-    // 4. Direct Blob Download (No New Tab)
+    // 4. Number Formatting Helper (e.g. 86.3K, 1.2M)
+    function formatCount(num) {
+        const n = Number(num);
+        if (!Number.isFinite(n) || n < 0) return '0';
+        if (n >= 1000000) return `${(n / 1000000).toFixed(1).replace(/\.0$/, '')}M`;
+        if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K`;
+        return String(n);
+    }
+
+    // 5. Direct Blob Download (No New Tab)
     async function triggerDirectDownload(url, filename, btnEl, useOwnProgress = true) {
         const statusMsg = document.getElementById('statusMsg');
         if (!url) return false;
@@ -655,7 +736,7 @@
         }
     }
 
-    // 5. Photo Bulk Select & Download
+    // 6. Photo Bulk Select & Download
     function toggleSelectAllPhotos() {
         const master = document.getElementById('selectAllPhotos');
         const checks = document.querySelectorAll('.photo-check');
@@ -667,15 +748,16 @@
 
     function updateSelectedCountLabel() {
         const checks = Array.from(document.querySelectorAll('.photo-check'));
+        if (checks.length === 0) return;
         const selectedCount = checks.filter((c) => c.checked).length;
         const master = document.getElementById('selectAllPhotos');
-        const bulkBtn = document.getElementById('downloadSelectedBtn');
+        const bulkBtn = document.getElementById('dlBulkPhotos');
 
         if (master) {
-            master.checked = checks.length > 0 && selectedCount === checks.length;
+            master.checked = selectedCount === checks.length;
         }
         if (bulkBtn) {
-            bulkBtn.textContent = `Download All Selected (${selectedCount})`;
+            bulkBtn.textContent = `Download All Selected Photos (${selectedCount})`;
             bulkBtn.disabled = selectedCount === 0;
         }
     }
@@ -683,7 +765,7 @@
     async function downloadSelectedPhotos() {
         const checks = Array.from(document.querySelectorAll('.photo-check')).filter((c) => c.checked);
         const statusMsg = document.getElementById('statusMsg');
-        const bulkBtn = document.getElementById('downloadSelectedBtn');
+        const bulkBtn = document.getElementById('dlBulkPhotos');
 
         if (checks.length === 0) {
             statusMsg.textContent = 'Please select at least one photo.';
@@ -707,7 +789,7 @@
         updateSelectedCountLabel();
     }
 
-    // 6. Reset for Another Video
+    // 7. Reset for Another Video
     function resetForAnotherVideo() {
         document.getElementById('results').style.display = 'none';
         document.getElementById('statusMsg').textContent = '';
@@ -719,7 +801,7 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 7. TikTok Video, Photo & Audio Fetch Logic
+    // 8. TikTok Video, Photo & Audio Fetch Logic
     async function fetchVideoData() {
         const urlInput = document.getElementById('tiktokUrl');
         const url = urlInput.value.trim();
@@ -749,15 +831,36 @@
             }
 
             const data = json.data;
+            const author = data.author || {};
+            const rawUsername = author.unique_id || author.id || 'creator';
+            const displayAuthor = rawUsername.startsWith('@') ? rawUsername : `@${rawUsername}`;
+
             document.getElementById('previewImage').src = data.cover || data.origin_cover || '/icon-512.png';
             document.getElementById('videoDesc').textContent = data.title || 'TikTok Media';
 
+            const avatarEl = document.getElementById('authorAvatar');
+            if (author.avatar) {
+                avatarEl.src = author.avatar;
+                avatarEl.style.display = 'block';
+            } else {
+                avatarEl.style.display = 'none';
+            }
+            document.getElementById('authorHandle').textContent = author.nickname
+                ? `${author.nickname} (${displayAuthor})`
+                : displayAuthor;
+
+            document.getElementById('statViews').textContent = formatCount(data.play_count);
+            document.getElementById('statLikes').textContent = formatCount(data.digg_count);
+            document.getElementById('statComments').textContent = formatCount(data.comment_count);
+            document.getElementById('statShares').textContent = formatCount(data.share_count);
+
             const slideshowEl = document.getElementById('photoSlideshow');
             const photoGridEl = document.getElementById('photoGrid');
-            const videoOptionsEl = document.getElementById('videoOptions');
+            const bulkPhotosBtn = document.getElementById('dlBulkPhotos');
 
             if (Array.isArray(data.images) && data.images.length > 0) {
                 slideshowEl.style.display = 'block';
+                bulkPhotosBtn.style.display = 'flex';
                 photoGridEl.innerHTML = '';
                 data.images.forEach((imgUrl, idx) => {
                     const photoIndex = idx + 1;
@@ -790,6 +893,7 @@
                 updateSelectedCountLabel();
             } else {
                 slideshowEl.style.display = 'none';
+                bulkPhotosBtn.style.display = 'none';
                 photoGridEl.innerHTML = '';
             }
 
@@ -798,15 +902,10 @@
             const wmUrl = data.wmplay || data.play || '';
             const audioUrl = data.music || '';
 
-            if (noWmUrl || hdUrl || wmUrl) {
-                videoOptionsEl.style.display = 'block';
-                bindDownloadBtn('dlHdNoWm', hdUrl, 'tiktok-hd.mp4');
-                bindDownloadBtn('dlNoWm', noWmUrl, 'tiktok-no-watermark.mp4');
-                bindDownloadBtn('dlWm', wmUrl, 'tiktok-watermark.mp4');
-                bindDownloadBtn('dlAudio', audioUrl, 'tiktok-audio.mp3');
-            } else {
-                videoOptionsEl.style.display = 'none';
-            }
+            bindDownloadBtn('dlHdNoWm', hdUrl, 'tiktok-hd.mp4');
+            bindDownloadBtn('dlNoWm', noWmUrl, 'tiktok-no-watermark.mp4');
+            bindDownloadBtn('dlWm', wmUrl, 'tiktok-watermark.mp4');
+            bindDownloadBtn('dlAudio', audioUrl, 'tiktok-audio.mp3');
 
             finishProgress('Media ready');
             resultsEl.style.display = 'block';
