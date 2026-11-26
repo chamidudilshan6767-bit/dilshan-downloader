@@ -20,9 +20,11 @@
         input:focus {
             outline: none;
         }
-        body {
+        html, body {
             background-color: #000000;
             color: #ffffff;
+        }
+        body {
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -220,7 +222,7 @@
         .post-top-row {
             display: flex;
             gap: 12px;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 10px;
         }
         .preview-media {
@@ -237,12 +239,36 @@
             flex: 1;
         }
         .video-desc {
-            font-size: 0.86rem;
+            font-size: 0.84rem;
             color: #ffffff;
-            font-weight: 600;
-            margin-bottom: 6px;
-            line-height: 1.35;
+            font-weight: 500;
+            margin-bottom: 4px;
+            line-height: 1.38;
             word-break: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .video-desc.expanded {
+            display: block;
+            -webkit-line-clamp: unset;
+            overflow: visible;
+        }
+        .read-more-btn {
+            background: none;
+            border: none;
+            color: #bbbbbb;
+            font-size: 0.76rem;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0;
+            margin-bottom: 8px;
+            display: none;
+        }
+        .read-more-btn:hover {
+            color: #ffffff;
+            text-decoration: underline;
         }
         .author-row {
             display: flex;
@@ -492,6 +518,7 @@
                     <img id="previewImage" src="" alt="Preview" class="preview-media">
                     <div class="post-info">
                         <p id="videoDesc" class="video-desc"></p>
+                        <button type="button" id="readMoreBtn" class="read-more-btn" onclick="toggleDescription()">Read more</button>
                         <div class="author-row">
                             <img id="authorAvatar" src="" alt="Creator" class="author-avatar" onerror="this.style.display='none'">
                             <span id="authorHandle" class="author-handle">@creator</span>
@@ -617,7 +644,28 @@
 
     updateInstallButtonVisibility();
 
-    // 2. Input Clear Button Helpers
+    // 2. Description Read More Toggle
+    function toggleDescription() {
+        const desc = document.getElementById('videoDesc');
+        const btn = document.getElementById('readMoreBtn');
+        const expanded = desc.classList.toggle('expanded');
+        btn.textContent = expanded ? 'Read less' : 'Read more';
+    }
+
+    function setupDescriptionClamp(text) {
+        const desc = document.getElementById('videoDesc');
+        const btn = document.getElementById('readMoreBtn');
+        desc.classList.remove('expanded');
+        desc.textContent = text || 'TikTok Media';
+        btn.textContent = 'Read more';
+
+        requestAnimationFrame(() => {
+            const isOverflowing = desc.scrollHeight > desc.clientHeight + 2 || (text && text.length > 95);
+            btn.style.display = isOverflowing ? 'inline-block' : 'none';
+        });
+    }
+
+    // 3. Input Clear Button Helpers
     function toggleClearBtn() {
         const input = document.getElementById('tiktokUrl');
         const clearBtn = document.getElementById('clearUrlBtn');
@@ -631,7 +679,7 @@
         input.focus();
     }
 
-    // 3. Progress Bar Helpers
+    // 4. Progress Bar Helpers
     let progressTimer = null;
 
     function showProgress(labelText, startPercent = 15) {
@@ -681,7 +729,7 @@
         setProgressValue(0, 'Processing...');
     }
 
-    // 4. Number Formatting Helper (e.g. 86.3K, 1.2M)
+    // 5. Number Formatting Helper (e.g. 86.3K, 1.2M)
     function formatCount(num) {
         const n = Number(num);
         if (!Number.isFinite(n) || n < 0) return '0';
@@ -690,7 +738,7 @@
         return String(n);
     }
 
-    // 5. Direct Blob Download (No New Tab)
+    // 6. Direct Blob Download (No New Tab)
     async function triggerDirectDownload(url, filename, btnEl, useOwnProgress = true) {
         const statusMsg = document.getElementById('statusMsg');
         if (!url) return false;
@@ -736,7 +784,7 @@
         }
     }
 
-    // 6. Photo Bulk Select & Download
+    // 7. Photo Bulk Select & Download
     function toggleSelectAllPhotos() {
         const master = document.getElementById('selectAllPhotos');
         const checks = document.querySelectorAll('.photo-check');
@@ -789,7 +837,7 @@
         updateSelectedCountLabel();
     }
 
-    // 7. Reset for Another Video
+    // 8. Reset for Another Video
     function resetForAnotherVideo() {
         document.getElementById('results').style.display = 'none';
         document.getElementById('statusMsg').textContent = '';
@@ -801,7 +849,7 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 8. TikTok Video, Photo & Audio Fetch Logic
+    // 9. TikTok Video, Photo & Audio Fetch Logic
     async function fetchVideoData() {
         const urlInput = document.getElementById('tiktokUrl');
         const url = urlInput.value.trim();
@@ -836,7 +884,7 @@
             const displayAuthor = rawUsername.startsWith('@') ? rawUsername : `@${rawUsername}`;
 
             document.getElementById('previewImage').src = data.cover || data.origin_cover || '/icon-512.png';
-            document.getElementById('videoDesc').textContent = data.title || 'TikTok Media';
+            setupDescriptionClamp(data.title || 'TikTok Media');
 
             const avatarEl = document.getElementById('authorAvatar');
             if (author.avatar) {
