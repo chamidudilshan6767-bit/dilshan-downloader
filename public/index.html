@@ -103,7 +103,9 @@
             line-height: 1.45;
         }
 
+        /* Input with Clear (X) Button */
         .input-group {
+            position: relative;
             margin-bottom: 14px;
         }
         .url-input {
@@ -111,7 +113,7 @@
             background: #121212;
             border: 1px solid #333333;
             color: #ffffff;
-            padding: 14px;
+            padding: 14px 42px 14px 14px;
             border-radius: 10px;
             font-size: 0.92rem;
             outline: none;
@@ -120,6 +122,29 @@
         .url-input:focus {
             border-color: #ffffff;
         }
+        .clear-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid #3a3a3a;
+            background: #1c1c1c;
+            color: #ffffff;
+            font-size: 15px;
+            line-height: 1;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .clear-btn:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
         .btn-download {
             width: 100%;
             background: #ffffff;
@@ -136,8 +161,37 @@
             cursor: not-allowed;
         }
 
+        /* Progress Bar */
+        .progress-wrapper {
+            display: none;
+            margin-top: 14px;
+            text-align: left;
+        }
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: #181818;
+            border: 1px solid #2e2e2e;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #ffffff;
+            transition: width 0.2s ease;
+        }
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+            font-size: 0.78rem;
+            color: #bbbbbb;
+        }
+
         .status-msg {
-            margin-top: 12px;
+            margin-top: 10px;
             font-size: 0.82rem;
             color: #bbbbbb;
             min-height: 18px;
@@ -208,10 +262,47 @@
             color: #ffffff;
         }
 
-        /* Slideshow Photos */
+        /* Slideshow Photos & Bulk Select */
         .slideshow-container {
             display: none;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
+        }
+        .photo-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .select-all-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            color: #ffffff;
+            cursor: pointer;
+            user-select: none;
+        }
+        .select-all-label input {
+            width: 16px;
+            height: 16px;
+            accent-color: #ffffff;
+            cursor: pointer;
+        }
+        .btn-bulk-dl {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-bulk-dl:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         .photo-grid {
             display: grid;
@@ -220,11 +311,22 @@
             margin-top: 8px;
         }
         .photo-item {
+            position: relative;
             background: #111111;
             border: 1px solid #262626;
             border-radius: 8px;
             padding: 8px;
             text-align: center;
+        }
+        .photo-check {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            width: 18px;
+            height: 18px;
+            accent-color: #ffffff;
+            cursor: pointer;
+            z-index: 2;
         }
         .photo-item img {
             width: 100%;
@@ -246,29 +348,60 @@
             cursor: pointer;
         }
 
+        /* Download Another Video */
+        .another-wrap {
+            margin-top: 16px;
+        }
+        .btn-another {
+            width: 100%;
+            background: #121212;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-another:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        /* Footer & Prominent Telegram Contact */
         .footer {
             text-align: center;
             margin-top: 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 12px;
+        }
+        .telegram-contact-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             gap: 8px;
+            background: #141414;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.3px;
+        }
+        .telegram-contact-btn:hover {
+            background: #ffffff;
+            color: #000000;
         }
         .powered-by {
             font-size: 13px;
             font-weight: 600;
             color: #bbbbbb;
             letter-spacing: 0.4px;
-        }
-        .contact-owner {
-            font-size: 12px;
-            color: #ffffff;
-            text-decoration: none;
-            border-bottom: 1px solid #444444;
-            padding-bottom: 2px;
-        }
-        .contact-owner:hover {
-            border-color: #ffffff;
         }
     </style>
 </head>
@@ -289,9 +422,22 @@
         <p class="subtitle">Download TikTok Videos (HD / No Watermark), Slideshow Photos & MP3 Audio</p>
 
         <div class="input-group">
-            <input type="url" id="tiktokUrl" class="url-input" placeholder="https://vt.tiktok.com/..." required>
+            <input type="url" id="tiktokUrl" class="url-input" placeholder="https://vt.tiktok.com/..." required oninput="toggleClearBtn()">
+            <button type="button" id="clearUrlBtn" class="clear-btn" title="Clear link" onclick="clearInputLink()">&times;</button>
         </div>
         <button type="button" onclick="fetchVideoData()" class="btn-download" id="searchBtn">Download Now</button>
+
+        <!-- Progress Bar -->
+        <div id="progressWrapper" class="progress-wrapper">
+            <div class="progress-track">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div class="progress-meta">
+                <span id="progressLabel">Processing...</span>
+                <span id="progressPercent">0%</span>
+            </div>
+        </div>
+
         <div id="statusMsg" class="status-msg"></div>
 
         <div id="results" class="results-container">
@@ -301,6 +447,15 @@
             <!-- Photo Slideshow Section -->
             <div id="photoSlideshow" class="slideshow-container">
                 <p class="download-options-title">TikTok Photos Found:</p>
+                <div class="photo-toolbar">
+                    <label class="select-all-label">
+                        <input type="checkbox" id="selectAllPhotos" checked onchange="toggleSelectAllPhotos()">
+                        <span>Select All Photos</span>
+                    </label>
+                    <button type="button" id="downloadSelectedBtn" class="btn-bulk-dl" onclick="downloadSelectedPhotos()">
+                        Download All Selected
+                    </button>
+                </div>
                 <div id="photoGrid" class="photo-grid"></div>
             </div>
 
@@ -322,11 +477,20 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Download Another Video (SnapTik Style Reset) -->
+            <div class="another-wrap">
+                <button type="button" class="btn-another" onclick="resetForAnotherVideo()">
+                    Download Another Video
+                </button>
+            </div>
         </div>
 
         <div class="footer">
-            <div class="powered-by">Powered By Dilshan</div>
-            <a href="https://t.me/dilshan7878?text=TIK%20TOK%20DL" target="_blank" rel="noopener noreferrer" class="contact-owner">Contact Owner</a>
+            <a href="https://t.me/dilshan7878?text=TIK%20TOK%20DL" target="_blank" rel="noopener noreferrer" class="telegram-contact-btn">
+                Contact Owner on Telegram (@dilshan7878)
+            </a>
+            <div class="powered-by">Powered By Chamidu Dilshan</div>
         </div>
     </div>
 </div>
@@ -381,21 +545,89 @@
 
     updateInstallButtonVisibility();
 
-    // 2. Direct Blob Download (No New Tab)
-    async function triggerDirectDownload(url, filename, btnEl) {
+    // 2. Input Clear Button Helpers
+    function toggleClearBtn() {
+        const input = document.getElementById('tiktokUrl');
+        const clearBtn = document.getElementById('clearUrlBtn');
+        clearBtn.style.display = input.value.trim().length > 0 ? 'flex' : 'none';
+    }
+
+    function clearInputLink() {
+        const input = document.getElementById('tiktokUrl');
+        input.value = '';
+        toggleClearBtn();
+        input.focus();
+    }
+
+    // 3. Progress Bar Helpers
+    let progressTimer = null;
+
+    function showProgress(labelText, startPercent = 15) {
+        const wrapper = document.getElementById('progressWrapper');
+        const fill = document.getElementById('progressFill');
+        const label = document.getElementById('progressLabel');
+        const percentText = document.getElementById('progressPercent');
+
+        clearInterval(progressTimer);
+        wrapper.style.display = 'block';
+        let current = startPercent;
+        fill.style.width = `${current}%`;
+        label.textContent = labelText;
+        percentText.textContent = `${current}%`;
+
+        progressTimer = setInterval(() => {
+            if (current < 90) {
+                current += 5;
+                fill.style.width = `${current}%`;
+                percentText.textContent = `${current}%`;
+            }
+        }, 180);
+    }
+
+    function setProgressValue(percent, labelText) {
+        const fill = document.getElementById('progressFill');
+        const label = document.getElementById('progressLabel');
+        const percentText = document.getElementById('progressPercent');
+        const clamped = Math.max(0, Math.min(100, Math.round(percent)));
+        fill.style.width = `${clamped}%`;
+        percentText.textContent = `${clamped}%`;
+        if (labelText) label.textContent = labelText;
+    }
+
+    function finishProgress(labelText = 'Completed') {
+        clearInterval(progressTimer);
+        setProgressValue(100, labelText);
+        setTimeout(() => {
+            document.getElementById('progressWrapper').style.display = 'none';
+            setProgressValue(0, 'Processing...');
+        }, 900);
+    }
+
+    function hideProgress() {
+        clearInterval(progressTimer);
+        document.getElementById('progressWrapper').style.display = 'none';
+        setProgressValue(0, 'Processing...');
+    }
+
+    // 4. Direct Blob Download (No New Tab)
+    async function triggerDirectDownload(url, filename, btnEl, useOwnProgress = true) {
         const statusMsg = document.getElementById('statusMsg');
-        if (!url) return;
+        if (!url) return false;
 
         const originalText = btnEl ? btnEl.textContent : '';
         if (btnEl) {
             btnEl.disabled = true;
             btnEl.textContent = 'Downloading...';
         }
+        if (useOwnProgress) {
+            showProgress(`Downloading ${filename}...`, 20);
+        }
         statusMsg.textContent = `Downloading ${filename}...`;
 
         try {
             const res = await fetch(url);
             if (!res.ok) throw new Error('Network error');
+            if (useOwnProgress) setProgressValue(70, `Saving ${filename}...`);
             const blob = await res.blob();
             const blobUrl = URL.createObjectURL(blob);
 
@@ -407,10 +639,14 @@
             a.remove();
 
             setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+            if (useOwnProgress) finishProgress('Download started');
             statusMsg.textContent = 'Download started.';
+            return true;
         } catch (err) {
+            if (useOwnProgress) hideProgress();
             statusMsg.textContent = 'Direct download blocked by server; opening file link to save.';
             window.location.href = url;
+            return false;
         } finally {
             if (btnEl) {
                 btnEl.disabled = false;
@@ -419,7 +655,71 @@
         }
     }
 
-    // 3. TikTok Video, Photo & Audio Fetch Logic
+    // 5. Photo Bulk Select & Download
+    function toggleSelectAllPhotos() {
+        const master = document.getElementById('selectAllPhotos');
+        const checks = document.querySelectorAll('.photo-check');
+        checks.forEach((chk) => {
+            chk.checked = master.checked;
+        });
+        updateSelectedCountLabel();
+    }
+
+    function updateSelectedCountLabel() {
+        const checks = Array.from(document.querySelectorAll('.photo-check'));
+        const selectedCount = checks.filter((c) => c.checked).length;
+        const master = document.getElementById('selectAllPhotos');
+        const bulkBtn = document.getElementById('downloadSelectedBtn');
+
+        if (master) {
+            master.checked = checks.length > 0 && selectedCount === checks.length;
+        }
+        if (bulkBtn) {
+            bulkBtn.textContent = `Download All Selected (${selectedCount})`;
+            bulkBtn.disabled = selectedCount === 0;
+        }
+    }
+
+    async function downloadSelectedPhotos() {
+        const checks = Array.from(document.querySelectorAll('.photo-check')).filter((c) => c.checked);
+        const statusMsg = document.getElementById('statusMsg');
+        const bulkBtn = document.getElementById('downloadSelectedBtn');
+
+        if (checks.length === 0) {
+            statusMsg.textContent = 'Please select at least one photo.';
+            return;
+        }
+
+        bulkBtn.disabled = true;
+        showProgress(`Downloading ${checks.length} photos...`, 5);
+
+        for (let i = 0; i < checks.length; i++) {
+            const imgUrl = checks[i].dataset.url;
+            const photoNum = checks[i].dataset.index;
+            const pct = Math.round(((i + 1) / checks.length) * 95);
+            setProgressValue(pct, `Photo ${i + 1} of ${checks.length}...`);
+            await triggerDirectDownload(imgUrl, `tiktok-photo-${photoNum}.jpg`, null, false);
+            await new Promise((r) => setTimeout(r, 250));
+        }
+
+        finishProgress('Selected photos processed');
+        statusMsg.textContent = `${checks.length} selected photos processed.`;
+        updateSelectedCountLabel();
+    }
+
+    // 6. Reset for Another Video
+    function resetForAnotherVideo() {
+        document.getElementById('results').style.display = 'none';
+        document.getElementById('statusMsg').textContent = '';
+        hideProgress();
+        const input = document.getElementById('tiktokUrl');
+        input.value = '';
+        toggleClearBtn();
+        input.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 7. TikTok Video, Photo & Audio Fetch Logic
     async function fetchVideoData() {
         const urlInput = document.getElementById('tiktokUrl');
         const url = urlInput.value.trim();
@@ -436,10 +736,12 @@
         searchBtn.textContent = 'Fetching...';
         statusMsg.textContent = 'Fetching media details...';
         resultsEl.style.display = 'none';
+        showProgress('Fetching TikTok details...', 15);
 
         try {
             const apiUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`;
             const response = await fetch(apiUrl);
+            setProgressValue(65, 'Parsing media links...');
             const json = await response.json();
 
             if (!json || json.code !== 0 || !json.data) {
@@ -458,23 +760,34 @@
                 slideshowEl.style.display = 'block';
                 photoGridEl.innerHTML = '';
                 data.images.forEach((imgUrl, idx) => {
+                    const photoIndex = idx + 1;
                     const div = document.createElement('div');
                     div.className = 'photo-item';
 
+                    const chk = document.createElement('input');
+                    chk.type = 'checkbox';
+                    chk.className = 'photo-check';
+                    chk.checked = true;
+                    chk.dataset.url = imgUrl;
+                    chk.dataset.index = String(photoIndex);
+                    chk.onchange = updateSelectedCountLabel;
+
                     const img = document.createElement('img');
                     img.src = imgUrl;
-                    img.alt = `Photo ${idx + 1}`;
+                    img.alt = `Photo ${photoIndex}`;
 
                     const btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = 'photo-dl-btn';
-                    btn.textContent = `Download Photo ${idx + 1}`;
-                    btn.onclick = () => triggerDirectDownload(imgUrl, `tiktok-photo-${idx + 1}.jpg`, btn);
+                    btn.textContent = `Download Photo ${photoIndex}`;
+                    btn.onclick = () => triggerDirectDownload(imgUrl, `tiktok-photo-${photoIndex}.jpg`, btn, true);
 
+                    div.appendChild(chk);
                     div.appendChild(img);
                     div.appendChild(btn);
                     photoGridEl.appendChild(div);
                 });
+                updateSelectedCountLabel();
             } else {
                 slideshowEl.style.display = 'none';
                 photoGridEl.innerHTML = '';
@@ -495,9 +808,12 @@
                 videoOptionsEl.style.display = 'none';
             }
 
+            finishProgress('Media ready');
             resultsEl.style.display = 'block';
             statusMsg.textContent = '';
+            resultsEl.scrollIntoView({ behavior: 'smooth' });
         } catch (err) {
+            hideProgress();
             statusMsg.textContent = 'Unable to fetch download links. Check if the link is public and try again.';
         } finally {
             searchBtn.disabled = false;
@@ -510,7 +826,7 @@
         if (!btn) return;
         if (url) {
             btn.style.display = 'flex';
-            btn.onclick = () => triggerDirectDownload(url, filename, btn);
+            btn.onclick = () => triggerDirectDownload(url, filename, btn, true);
         } else {
             btn.style.display = 'none';
         }
