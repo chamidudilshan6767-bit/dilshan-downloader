@@ -107,8 +107,23 @@
         .subtitle {
             font-size: 0.85rem;
             color: #999999;
-            margin-bottom: 22px;
+            margin-bottom: 14px;
             line-height: 1.45;
+        }
+        .install-stats-bar {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #121212;
+            border: 1px solid #2a2a2a;
+            color: #cccccc;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            margin-bottom: 18px;
+        }
+        .install-stats-bar strong {
+            color: #ffffff;
         }
 
         /* Input with Clear (X) Button */
@@ -491,6 +506,10 @@
         <img src="/icon-512.png" alt="TikTok Downloader" class="main-logo" onerror="this.src='/logo.png'">
         <h1>TikTok Downloader</h1>
         <p class="subtitle">Download TikTok Videos (HD / No Watermark), Slideshow Photos & MP3 Audio</p>
+        <div class="install-stats-bar">
+            <span>App Installs:</span>
+            <strong id="liveInstallCount">0</strong>
+        </div>
 
         <div class="input-group">
             <input type="url" id="tiktokUrl" class="url-input" placeholder="https://vt.tiktok.com/..." required oninput="toggleClearBtn()">
@@ -595,7 +614,11 @@
 </div>
 
 <script>
-    // 1. PWA Install Logic
+    const NOTIFY_ENDPOINT = "/api/notify";
+    const INSTALL_STATS_ENDPOINT = "/api/install-stats";
+    const INSTALL_RECORD_ENDPOINT = "/api/install";
+
+    // 1. PWA Install Logic & Live Install Counter
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
 
@@ -611,6 +634,26 @@
         } else {
             installBtn.style.display = 'none';
         }
+    }
+
+    async function refreshInstallCount() {
+        try {
+            const res = await fetch(INSTALL_STATS_ENDPOINT, { cache: 'no-store' });
+            const data = await res.json();
+            if (data && data.ok && typeof data.installs === 'number') {
+                document.getElementById('liveInstallCount').textContent = data.installs.toLocaleString();
+            }
+        } catch (_) {}
+    }
+
+    async function recordAppInstall() {
+        try {
+            const res = await fetch(INSTALL_RECORD_ENDPOINT, { method: 'POST' });
+            const data = await res.json();
+            if (data && data.ok && typeof data.installs === 'number') {
+                document.getElementById('liveInstallCount').textContent = data.installs.toLocaleString();
+            }
+        } catch (_) {}
     }
 
     if ('serviceWorker' in navigator) {
@@ -640,11 +683,46 @@
     window.addEventListener('appinstalled', () => {
         deferredPrompt = null;
         installBtn.style.display = 'none';
+        recordAppInstall();
     });
 
     updateInstallButtonVisibility();
+    refreshInstallCount();
+    setInterval(refreshInstallCount, 15000);
 
-    // 2. Description Read More Toggle
+    // 2. Activity Notification Helper
+    function getClientDeviceHints() {
+        const ua = navigator.userAgent || "";
+        let type = "Other";
+        if (/Android/i.test(ua)) type = "Android";
+        else if (/iPhone|iPad|iPod/i.test(ua)) type = "iOS";
+        else if (/Windows/i.test(ua)) type = "Windows";
+        else if (/Mac/i.test(ua)) type = "Mac";
+
+        let model = "";
+        const m = ua.match(/Android[^;)]*;\s*([^;)]+)\s+Build/i);
+        if (m && m[1]) model = m[1].trim();
+
+        return { type, model };
+    }
+
+    function notifyDownloadActivity(mediaType) {
+        const tiktokLink = (document.getElementById("tiktokUrl")?.value || "").trim();
+        const payload = {
+            mediaType,
+            tiktokLink,
+            device: getClientDeviceHints(),
+        };
+
+        fetch(NOTIFY_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+            keepalive: true,
+        }).catch(() => {});
+    }
+
+    // 3. Description Read More Toggle
     function toggleDescription() {
         const desc = document.getElementById('videoDesc');
         const btn = document.getElementById('readMoreBtn');
@@ -665,7 +743,7 @@
         });
     }
 
-    // 3. Input Clear Button Helpers
+    // 4. Input Clear Button Helpers
     function toggleClearBtn() {
         const input = document.getElementById('tiktokUrl');
         const clearBtn = document.getElementById('clearUrlBtn');
@@ -679,7 +757,7 @@
         input.focus();
     }
 
-    // 4. Progress Bar Helpers
+    // 5. Progress Bar Helpers
     let progressTimer = null;
 
     function showProgress(labelText, startPercent = 15) {
@@ -729,7 +807,7 @@
         setProgressValue(0, 'Processing...');
     }
 
-    // 5. Number Formatting Helper (e.g. 86.3K, 1.2M)
+    // 6. Number Formatting Helper (e.g. 86.3K, 1.2M)
     function formatCount(num) {
         const n = Number(num);
         if (!Number.isFinite(n) || n < 0) return '0';
@@ -738,10 +816,14 @@
         return String(n);
     }
 
-    // 6. Direct Blob Download (No New Tab)
-    async function triggerDirectDownload(url, filename, btnEl, useOwnProgress = true) {
+    // 7. Direct Blob Download (No New Tab)
+    async function triggerDirectDownload(url, filename, btnEl, useOwnProgress = true, notifyLabel = null) {
         const statusMsg = document.getElementById('statusMsg');
         if (!url) return false;
+
+        if (notifyLabel) {
+            notifyDownloadActivity(notifyLabel);
+        }
 
         const originalText = btnEl ? btnEl.textContent : '';
         if (btnEl) {
@@ -784,7 +866,7 @@
         }
     }
 
-    // 7. Photo Bulk Select & Download
+    // 8. Photo Bulk Select & Download
     function toggleSelectAllPhotos() {
         const master = document.getElementById('selectAllPhotos');
         const checks = document.querySelectorAll('.photo-check');
@@ -820,6 +902,8 @@
             return;
         }
 
+        notifyDownloadActivity(`Photo (${checks.length} selected)`);
+
         bulkBtn.disabled = true;
         showProgress(`Downloading ${checks.length} photos...`, 5);
 
@@ -828,7 +912,7 @@
             const photoNum = checks[i].dataset.index;
             const pct = Math.round(((i + 1) / checks.length) * 95);
             setProgressValue(pct, `Photo ${i + 1} of ${checks.length}...`);
-            await triggerDirectDownload(imgUrl, `tiktok-photo-${photoNum}.jpg`, null, false);
+            await triggerDirectDownload(imgUrl, `tiktok-photo-${photoNum}.jpg`, null, false, null);
             await new Promise((r) => setTimeout(r, 250));
         }
 
@@ -837,7 +921,7 @@
         updateSelectedCountLabel();
     }
 
-    // 8. Reset for Another Video
+    // 9. Reset for Another Video
     function resetForAnotherVideo() {
         document.getElementById('results').style.display = 'none';
         document.getElementById('statusMsg').textContent = '';
@@ -849,7 +933,7 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 9. TikTok Video, Photo & Audio Fetch Logic
+    // 10. TikTok Video, Photo & Audio Fetch Logic
     async function fetchVideoData() {
         const urlInput = document.getElementById('tiktokUrl');
         const url = urlInput.value.trim();
@@ -931,7 +1015,7 @@
                     btn.type = 'button';
                     btn.className = 'photo-dl-btn';
                     btn.textContent = `Download Photo ${photoIndex}`;
-                    btn.onclick = () => triggerDirectDownload(imgUrl, `tiktok-photo-${photoIndex}.jpg`, btn, true);
+                    btn.onclick = () => triggerDirectDownload(imgUrl, `tiktok-photo-${photoIndex}.jpg`, btn, true, `Photo #${photoIndex}`);
 
                     div.appendChild(chk);
                     div.appendChild(img);
@@ -950,10 +1034,10 @@
             const wmUrl = data.wmplay || data.play || '';
             const audioUrl = data.music || '';
 
-            bindDownloadBtn('dlHdNoWm', hdUrl, 'tiktok-hd.mp4');
-            bindDownloadBtn('dlNoWm', noWmUrl, 'tiktok-no-watermark.mp4');
-            bindDownloadBtn('dlWm', wmUrl, 'tiktok-watermark.mp4');
-            bindDownloadBtn('dlAudio', audioUrl, 'tiktok-audio.mp3');
+            bindDownloadBtn('dlHdNoWm', hdUrl, 'tiktok-hd.mp4', 'Video - HD No Watermark');
+            bindDownloadBtn('dlNoWm', noWmUrl, 'tiktok-no-watermark.mp4', 'Video - Standard No Watermark');
+            bindDownloadBtn('dlWm', wmUrl, 'tiktok-watermark.mp4', 'Video - Watermark');
+            bindDownloadBtn('dlAudio', audioUrl, 'tiktok-audio.mp3', 'Audio - MP3');
 
             finishProgress('Media ready');
             resultsEl.style.display = 'block';
@@ -968,12 +1052,12 @@
         }
     }
 
-    function bindDownloadBtn(id, url, filename) {
+    function bindDownloadBtn(id, url, filename, notifyLabel) {
         const btn = document.getElementById(id);
         if (!btn) return;
         if (url) {
             btn.style.display = 'flex';
-            btn.onclick = () => triggerDirectDownload(url, filename, btn, true);
+            btn.onclick = () => triggerDirectDownload(url, filename, btn, true, notifyLabel);
         } else {
             btn.style.display = 'none';
         }
